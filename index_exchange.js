@@ -30,6 +30,60 @@ var ma_5 = [];
 var ma_20 = []; // SYMBOL 0005
 var ask_20 = [];
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// utility functions
+////////////////////////////////////////////////////////////////////////////////////////////
+function min(list) {
+  // implement me
+  if (!list.length) {
+    return undefined;
+  }
+  var currMin = list[0].price;
+  var currMinObj = list[0];
+  for (var i=0; i<list.length; ++i) {
+    if (currMin > list[i].price) {
+      currMin = list[i].price;
+      currMinObj = list[i];
+    }
+  }
+  return currMinObj;
+}
+
+function max(list) {
+  // implement me
+  if (!list.length) {
+    return undefined;
+  }
+  var currMin = list[0].price;
+  var currMinObj = list[0];
+  for (var i=0; i<list.length; ++i) {
+    if (currMin < list[i].price) {
+      currMin = list[i].price;
+      currMinObj = list[i];
+    }
+  }
+  return currMinObj;
+}
+
+function avg(list) {
+  // implement me
+  if (!list.length) {
+    return undefined;
+  }
+  var priceSum = 0;
+  for (var i=0; i<list.length; ++i) {
+    priceSum+=list[i].price;
+  }
+  return priceSum/list.length;
+}
+
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 // helper functions
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,31 +112,14 @@ function pullMarketData_3(callback) {
   })
 }
 
-function pullSymbolData_1(symbol, callback) {
-  request.get('http://cis2016-exchange1.herokuapp.com/api/market_data'+symbol, function (error, response, body) {
+function pullSymbolData(exchangevenue, symbol, callback) {
+  request.get('http://cis2016-exchange'+exchangevenue+'.herokuapp.com/api/market_data/'+symbol, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       //console.log("pulled market_data_3");
-      callback(body);
+      callback(exchangevenue, symbol, body);
     }
   })
 }
-function pullSymbolData_2(symbol, callback) {
-  request.get('http://cis2016-exchange2.herokuapp.com/api/market_data'+symbol, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      //console.log("pulled market_data_3");
-      callback(body);
-    }
-  })
-}
-function pullSymbolData_3(symbol, callback) {
-  request.get('http://cis2016-exchange3.herokuapp.com/api/market_data'+symbol, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      //console.log("pulled market_data_3");
-      callback(body);
-    }
-  })
-}
-
 
 function pullTeamData(callback) {
   request.get('http://cis2016-teamtracker.herokuapp.com/api/teams/'+TEAM_UID, function (error, response, body) {
@@ -93,7 +130,7 @@ function pullTeamData(callback) {
   })
 }
 
-function createBuyRequest(symbol, ask, qty, limit, callback) {
+function createBuyRequest(venue, symbol, ask, qty, limit, callback) {
   var order_type = "market";
   if (limit) {
     order_type = "limit";
@@ -107,7 +144,7 @@ function createBuyRequest(symbol, ask, qty, limit, callback) {
   	"qty": qty,
   	"order_type":order_type
   };
-  request.post({url:'http://cis2016-exchange1.herokuapp.com/api/orders', formData:requestData}, function (error, response, body) {
+  request.post({url:'http://cis2016-exchange'+venue+'.herokuapp.com/api/orders', formData:requestData}, function (error, response, body) {
     console.log("createBuyRequest(): "+order_type+"_"+symbol+" $"+ask+" x"+qty);
     if (!error && response.statusCode == 200) {
       //console.log(body) // Show the HTML for the Google homepage.
@@ -122,7 +159,7 @@ function createBuyRequest(symbol, ask, qty, limit, callback) {
   })
 }
 
-function createSellRequest(symbol, bid, qty, limit, callback) {
+function createSellRequest(venue, symbol, bid, qty, limit, callback) {
   var order_type = "market";
   if (limit) {
     order_type = "limit";
@@ -136,7 +173,7 @@ function createSellRequest(symbol, bid, qty, limit, callback) {
   	"qty": qty,
   	"order_type":order_type
   };
-  request.post({url:'http://cis2016-exchange1.herokuapp.com/api/orders', formData:requestData}, function (error, response, body) {
+  request.post({url:'http://cis2016-exchange'+venue+'.herokuapp.com/api/orders', formData:requestData}, function (error, response, body) {
     console.log("createSellRequest(): "+order_type+"_"+symbol+" $"+bid+" x"+qty);
     if (!error && response.statusCode == 200) {
       //console.log(body) // Show the HTML for the Google homepage.\
@@ -228,13 +265,13 @@ function repeatPullMarketData_1(data) {
 
       if(ma_20[ma_20.length - 1] < ma_5[ma_5.length - 1] && prev_ma20above){
         //buy
-        createBuyRequest("0005", currAsk, 1000, true, function(data){
-          // d = JSON.parse(data);
-          // if (d.fills[0]) {
-          //   profit-=d.fills[0].price;
-          // }
-          // console.log("profit so far = " + profit);
-        });
+        // createBuyRequest(1, "0005", currAsk*0.98, 1, true, function(data){
+        //   d = JSON.parse(data);
+        //   if (d.fills[0]) {
+        //     profit-=d.fills[0].price;
+        //   }
+        //   //console.log("profit so far = " + profit);
+        // });
       }
 
       // protection mechanism for selling at low price
@@ -243,13 +280,13 @@ function repeatPullMarketData_1(data) {
       }
       if(ma_20[ma_20.length - 1] > ma_5[ma_5.length - 1] && !prev_ma20above){
         // sell
-        createSellRequest("0005", currBid, 1000, true, function(data){
-          // d = JSON.parse(data);
-          // if (d.fills[0]) {
-          //   profit+=d.fills[0].price;
-          // }
-          // console.log("profit so far = " + profit);
-        });
+        // createSellRequest(1, "0005", currBid*1.02, 1, true, function(data){
+        //   d = JSON.parse(data);
+        //   if (d.fills[0]) {
+        //     profit+=d.fills[0].price;
+        //   }
+        //   //console.log("profit so far = " + profit);
+        // });
       }
 
     }
@@ -294,8 +331,8 @@ function repeatPullSymbolData_3(symbol, data) {
 }
 pullMarketData_3(function(data) {
   repeatPullMarketData_3(data);
-});*/
-
+});
+*/
 
 // team data every 5 secs, also after buy or sell
 function repeatPullTeamData(data) {
@@ -305,6 +342,104 @@ function repeatPullTeamData(data) {
 pullTeamData(function(data){
   repeatPullTeamData();
 });
+
+
+
+/////////////////////////////////////////////////////////////////////
+// pull all pending buy and sell lists from all exchange centers for each symbol
+////////////////////////////////////////////////////////////////////
+
+var POTENTIAL_PROFIT_THRESHOLD = 1.001;  // potential profit
+var RISK_TOLERENCE_THRESHOLD = 0.92;   // less than 1 might be dangerous
+var VOLUME_THRESHOLD = 10;   //
+var TRADE_SYMBOL_ITEM = "0001";
+
+var sellList=[];  // CONSIDER THIS VARIABLE LOCKED
+var buyList=[];   // CONSIDER THIS VARIABLE LOCKED
+var dataSyncCounter = 3;  // DO NOT MODIFY THIS VARIABLE ELSEWHERE
+var lastTransactionTime = 0;
+
+function symbolDataHandler(_symbol) {
+  //console.log("symbol data handler");
+  // don't allow another transaction for 10 secs
+  if (((new Date()) - lastTransactionTime) < 10000) {
+    console.log("transaction already made");
+    return;
+  }
+
+  minSell = min(sellList); // what they sell
+  maxBuy = max(buyList); // what they buy
+  // error check
+  if (!minSell || !maxBuy) {
+    return;
+  }
+  avgSell = avg(sellList);
+  avgBuy = avg(buyList);
+
+  var potentialMaxProfit = maxBuy.price/minSell.price;
+  var averageExpectedLoss = avgBuy/avgSell;
+  var riskIndex = potentialMaxProfit*averageExpectedLoss;   // riskIndex=>1: ok, riskIndex<1: dangerous
+  var tradableVolumeUnderEstimate = Math.min(minSell.volume, maxBuy.volume);
+
+  console.log("potentialMaxProfit = "+potentialMaxProfit);
+  console.log("riskIndex = "+riskIndex);
+  // if it is tradable, profitable, risk-free, then SELL AND BUY AT THE SAME TIME.
+  if (potentialMaxProfit>POTENTIAL_PROFIT_THRESHOLD && riskIndex>RISK_TOLERENCE_THRESHOLD && tradableVolumeUnderEstimate>VOLUME_THRESHOLD) {
+
+    //console.log("min sell: ("+minSell.venue+") $"+minSell.price+" x"+minSell.volume+"    ave="+avgSell);
+    //console.log("max buy: ("+maxBuy.venue+") $"+maxBuy.price+" x"+maxBuy.volume+"    ave="+avgBuy);
+    //console.log("potentialMaxProfit = "+potentialMaxProfit);
+    //console.log("averageExpectedLoss = "+averageExpectedLoss);
+    //console.log("riskIndex = "+riskIndex);
+    //console.log("tradableVolumeUnderEstimate = "+tradableVolumeUnderEstimate);
+    createBuyRequest(minSell.venue, TRADE_SYMBOL_ITEM, minSell.price, (Math.max(tradableVolumeUnderEstimate/10),3), true, function(data) {
+      d = JSON.parse(data);
+      console.log(d.side + " "+d.status+" $"+d.price+" x"+d.qty);
+    });
+    createSellRequest(maxBuy.venue, TRADE_SYMBOL_ITEM, maxBuy.price, (Math.max(tradableVolumeUnderEstimate/10),3), true, function(data) {
+      d = JSON.parse(data);
+      console.log(d.side + " "+d.status+" $"+d.price+" x"+d.qty);
+    })
+    lastTransactionTime = (new Date());
+
+  }
+
+}
+
+function assembleAndRepeatPullSymbolData(_venue, _symbol, data){
+  //console.log("parseSymbolData from exchange "+_venue+" ("+dataSyncCounter+")");
+  // reset all data for new incoming dataset
+  if (dataSyncCounter==3) {
+    sellList=[];
+    buyList=[];
+  }
+  var dd = JSON.parse(data);
+  //console.log(dd.sell);
+  for (var k in dd.sell){
+    //console.log(k+" => "+dd.sell[k]);
+    sellList.push({venue:_venue, price:parseFloat(k), volume:dd.sell[k]});
+  }
+  for (var k in dd.buy){
+    buyList.push({venue:_venue, price:parseFloat(k), volume:dd.buy[k]});
+  }
+  --dataSyncCounter;
+
+  // DATA download COMPLETED: handle and repeat
+  if (dataSyncCounter==0) {
+    symbolDataHandler(_symbol); // sellList and buyList as parameters
+    dataSyncCounter=3;
+    initPullSymbolData();
+  }
+
+}
+
+function initPullSymbolData() {
+  pullSymbolData(1, TRADE_SYMBOL_ITEM, assembleAndRepeatPullSymbolData);
+  pullSymbolData(2, TRADE_SYMBOL_ITEM, assembleAndRepeatPullSymbolData);
+  pullSymbolData(3, TRADE_SYMBOL_ITEM, assembleAndRepeatPullSymbolData);
+}
+
+initPullSymbolData();
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // front-end APIs
