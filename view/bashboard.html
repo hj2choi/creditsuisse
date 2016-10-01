@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <!--styles-->
+    
+	<link rel="stylesheet" type="text/css" href="style.css">
+    
+	
+	<!-- UI scripts dependencies -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+    <!-- jquery dependencies -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!--bootstrap script dependencies 
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- angular.js dependencies 
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
+    <script src="js/dependencies/angularfire.min.js"></script>
+    <!-- scripts -->
+	
+    <!--<script src="js/runtimeLogger.js"></script>-->
+  </head>
+
+  <body>
+    <div>
+	  <table id = "status">
+		<tr>  Status< /tr>
+		<tr id = "status-cash">        <th>Cash</th>   <th>1000</th><tr>
+		<tr id = "status-holding-0001"><th>0001:</th>  <th>1000</th><tr>
+		<tr id = "status-holding-0005"><th>0005:</th>  <th>1000</th><tr>
+		<tr id = "status-holding-0386"><th>0386:</th>  <th>1000</th><tr>
+		<tr id = "status-holding-0388"><th>0388:</th>  <th>1000</th><tr>
+		<tr id = "status-holding-3988"><th>3988:</th>  <th>1000</th><tr>
+		
+	  
+	  </table>
+	
+      <table id= "price-table"\>
+	      <tr>Market Data</tr>
+		  <tr>
+			<th>time</th>
+			<th>0001</th>
+			<th>0005</th> 
+			<th>0386</th>
+			<th>0388</th>
+			<th>3988</th>
+		  </tr>
+  
+		</table>
+    </div>
+
+  </body>
+<script>
+
+
+	window.onload = function(){
+			insRow();
+			insRow();
+			insRow();
+			insRow();
+			
+	}
+	
+	function insRow()
+	{
+   
+      var table = document.getElementById('price-table');
+   
+      // Insert a row in the table at the last row
+      var newRow   = table.insertRow(table.rows.length);
+
+      // Insert a cell in the row at index 0
+      
+	  
+	  for(var i =0;i<6;i++){
+		createCell(newRow);
+	  }
+	  
+	
+	
+	
+	}
+	function createCell(newRow){
+		var newCell  = newRow.insertCell(0);
+		var newText  = document.createTextNode('fd');
+		newCell.appendChild(newText);
+		return newCell;
+	}
+</script>
+  
+
+</html>

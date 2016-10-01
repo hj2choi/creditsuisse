@@ -1,0 +1,8 @@
+#price-table{
+	 table-layout: fixed;
+     column-gap: 40px;
+	 column-width: 200px;
+}
+#price-table.th{
+	background-color: red;
+}

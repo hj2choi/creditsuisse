@@ -3,6 +3,7 @@ var TEAM_UID = "yPlWaf6NAoM6yjTTEs4_5g"
 var express = require('express')
 var request = require('request')
 var app = express()
+var path = require('path')
 
 app.set('port', (process.env.PORT || 5000))
 app.use(express.static(__dirname + '/public'))
@@ -79,6 +80,9 @@ function createSellRequest(symbol, bid, qty, limit, callback) {
 }
 
 
+app.get('/bashboard', function(req,res) {
+	res.sendFile(path.join(__dirname+'/view/bashboard.html'));
+})
 
 app.get('/api/market_data', function(req, res) {
   res.send(market_data);
@@ -110,7 +114,7 @@ app.get('/', function(req, res) {
 })
 
 app.listen(app.get('port'), function() {
-  console.log("Node app is running at localhost:" + app.get('port'))
+  console.log("Node app is running at localhost:" + app.	get('port'))
 })
 
 
