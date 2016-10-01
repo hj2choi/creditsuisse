@@ -255,6 +255,11 @@ pullMarketData_3(function(data) {
 });
 
 
+pullSymbolData_1(function() {
+
+});
+
+
 // team data every 5 secs, also after buy or sell
 function repeatPullTeamData(data) {
   team_data=data;
