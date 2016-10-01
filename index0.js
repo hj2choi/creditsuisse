@@ -22,6 +22,7 @@ var bought_flag = false;
 
 var team_data;
 var market_data_1;
+var market_data_1_raw;
 var market_data_2;
 var market_data_3;
 var historical_market_data_1;
@@ -132,8 +133,9 @@ function createSellRequest(symbol, bid, qty, limit, callback) {
 // automated scripts
 //////////////////////////////////////////////////////////////////////////////////////////////
 function repeatPullMarketData_1(data) {
+  market_data_1_raw = data;
   market_data_1=JSON.parse(data);
-
+ 
   //console.log(market_data_1[0]);
   for (var i=0; i<market_data_1.length; ++i) {
     //console.log(market_data_1[i].symbol);
@@ -205,7 +207,7 @@ function repeatPullMarketData_1(data) {
 
       if(!bought_flag && ma_20[ma_20.length - 1] < ma_5[ma_5.length - 1] && prev_ma20above){
         //buy
-        createBuyRequest("0005", currAsk, 1, false, function(data){
+        createBuyRequest("0005", currAsk, 50, true, function(data){
           d = JSON.parse(data);
           if (d.fills[0]) {
             profit-=d.fills[0].price;
@@ -222,7 +224,7 @@ function repeatPullMarketData_1(data) {
       }
       if(bought_flag && currBid>last_bought_price && ma_20[ma_20.length - 1] > ma_5[ma_5.length - 1] && !prev_ma20above){
         // sell
-        createSellRequest("0005", currBid, 1, false, function(data){
+        createSellRequest("0005", currBid, 50, true, function(data){
           d = JSON.parse(data);
           if (d.fills[0]) {
             profit+=d.fills[0].price;
@@ -278,7 +280,8 @@ app.get('/bashboard', function(req,res) {
 });
 
 app.get('/api/market_data_1', function(req, res) {
-  res.send(market_data_1);
+  res.send(market_data_1_raw);
+  console.log(market_data_1_raw);
 });
 app.get('/api/market_data_2', function(req, res) {
   res.send(market_data_2);
@@ -289,6 +292,12 @@ app.get('/api/market_data_3', function(req, res) {
 
 app.get('/api/team_data', function(req, res) {
   res.send(team_data);
+
+});
+app.get('/api/buy', function(req, res) {
+  console.log(req);
+  
+  //createBuyRequest("0001", 113, 3, false,function(data){res.send(data)});
 });
 // remove costly stocks first!
 

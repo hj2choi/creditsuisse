@@ -1,14 +1,20 @@
 <html>
-  <head>
+	<style>
+	table, th, td {
+   border: 1px solid black;
+	}
+	
+	</style>
+        
+	<head>
     <!--styles-->
     
-	<link rel="stylesheet" type="text/css" href="style.css">
-    
+	
 	
 	<!-- UI scripts dependencies -->
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-
+    
     <!-- jquery dependencies -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <!--bootstrap script dependencies 
@@ -22,16 +28,28 @@
     <!--<script src="js/runtimeLogger.js"></script>-->
   </head>
 
+  
+  
   <body>
     <div>
+	  <div>
+		
+		
+  Stock: <input type="text" id="stock"><br>
+Price: <input type="text" id="price"><br> 
+ Amount: <input type="text" id="amount"><br>
+  Action: <input type="text" id="action"><br>
+			<input type="submit" value="Submit" onclick="submit()">
+		
+	  </div>
 	  <table id = "status">
 		<tr>  Status< /tr>
-		<tr id = "status-cash">        <th>Cash</th>   <th>1000</th><tr>
-		<tr id = "status-holding-0001"><th>0001:</th>  <th>1000</th><tr>
-		<tr id = "status-holding-0005"><th>0005:</th>  <th>1000</th><tr>
-		<tr id = "status-holding-0386"><th>0386:</th>  <th>1000</th><tr>
-		<tr id = "status-holding-0388"><th>0388:</th>  <th>1000</th><tr>
-		<tr id = "status-holding-3988"><th>3988:</th>  <th>1000</th><tr>
+		<tr ><th>Cash</th>   <th id = "status-cash"></th><tr>
+		<tr ><th>0001:</th>  <th id = "status-holding-0001"></th><tr>
+		<tr ><th>0005:</th>  <th id = "status-holding-0005"></th><tr>
+		<tr ><th>0386:</th>  <th id = "status-holding-0386"></th><tr>
+		<tr ><th>0388:</th>  <th id = "status-holding-0388"></th><tr>
+		<tr ><th>3988:</th>  <th id = "status-holding-3988"></th><tr>
 		
 	  
 	  </table>
@@ -40,11 +58,16 @@
 	      <tr>Market Data</tr>
 		  <tr>
 			<th>time</th>
-			<th>0001</th>
-			<th>0005</th> 
-			<th>0386</th>
-			<th>0388</th>
-			<th>3988</th>
+			<th>0001 buy</th>
+			<th>0001 sell</th>
+			<th>0005 buy</th> 
+			<th>0005 sell</th> 
+			<th>0386 buy</th>
+			<th>0386 sell</th>
+			<th>0388 buy</th>
+			<th>0388 sell</th>
+			<th>3988 buy</th>
+			<th>3988 sell</th>
 		  </tr>
   
 		</table>
@@ -52,38 +75,121 @@
 
   </body>
 <script>
+	var lastprices = [0,0,0,0,0,0,0,0,0,0,0]; 
+	var buy0001;
+	var sell0001;
+	var buy0005;
+	var sell0005;
+	var buy0386;
+	var sell0386;
+	var buy0388;
+	var sell0388;
+	var buy3988;
+	var sell3988;
 
 
-	window.onload = function(){
-			insRow();
-			insRow();
-			insRow();
-			insRow();
+	var i = setInterval(function() {getMarketData();},3000);
+	var i = setInterval(function() {getStatus();},1000);
+	
+	function submit(){
+	
+	
+       var action = document.getElementById("action").value;	
+	    var amount = document.getElementById("amount").value;	
+		 var stock = document.getElementById("stock").value;	
+		 var price = document.getElementById("price").value;	
+	
+	   var data = "{\"team_uid\":\"yPlWaf6NAoM6yjTTEs4_5g\","
+	   +"\"side\":"+action+","
+	   +"\"symbol\":"+ stock+","
+	   +"\"ask\":"+price+","
+	   +"\"qty\":"+ amount+","
+	   +"\"order_type\":\"market\""
+	   +"};";
+	    
+		$.get('/api/buy', function(res){
+			    
+				
+				//var obj = $.parseJSON(res);
+					
+					
+					//insertRow(obj);
+						
+			});
+	}
+	
+	
+	function getStatus(){
+			$.get('/api/team_data', function(res){
+				    var obj = $.parseJSON(res);
+					$("#status-cash").html(obj.cash);
+					$("#status-holding-0001").html(obj["0001"]);
+					$("#status-holding-0005").html(obj["0005"]);
+					$("#status-holding-0386").html(obj["0386"]);
+					$("#status-holding-0388").html(obj["0388"]);
+					$("#status-holding-3988").html(obj["3988"]);
+					//Document.getElementById("status-holding-0001").text(obj[6]);
+					
+			});
 			
 	}
 	
-	function insRow()
+	
+			
+	function getMarketData(){
+			$.get('/api/market_data_1', function(res){
+			    
+				
+				var obj = $.parseJSON(res);
+					
+					
+					insertRow(obj);
+						
+			});
+			
+	}
+	
+	function insertRow(obj)
 	{
    
       var table = document.getElementById('price-table');
-   
+	  	  
+	  
       // Insert a row in the table at the last row
       var newRow   = table.insertRow(table.rows.length);
-
-      // Insert a cell in the row at index 0
+	   
+	   
+	    
       
 	  
-	  for(var i =0;i<6;i++){
-		createCell(newRow);
-	  }
-	  
+	   
+		createCell(newRow, obj[1].time,0);
+		
+		
+		createCell(newRow, obj[4].bid,1);     //0001
+		createCell(newRow, obj[4].ask,2);
+		createCell(newRow, obj[0].bid,3);      //0005
+		createCell(newRow, obj[0].ask,4);
+	    createCell(newRow, obj[1].bid,5);
+		createCell(newRow, obj[1].ask,6);
+		createCell(newRow, obj[2].bid,7);
+		createCell(newRow, obj[2].ask,8);
+		createCell(newRow, obj[3].bid,9);
+		createCell(newRow, obj[3].ask,10);
+	    
+		lastprices = ["",obj[4].bid,obj[4].ask,obj[0].bid,obj[0].ask,obj[1].bid,obj[1].ask,obj[2].bid,obj[2].ask,obj[3].bid,obj[3].ask];
+		
 	
 	
 	
 	}
-	function createCell(newRow){
-		var newCell  = newRow.insertCell(0);
-		var newText  = document.createTextNode('fd');
+	function createCell(newRow,content,i){
+		var newCell  = newRow.insertCell(i);
+		if(i==0) ;
+		else if (content==lastprices[i] )newCell.style.backgroundColor = "white";
+		else if ( content>lastprices[i] )newCell.style.backgroundColor = "green";
+		else {newCell.style.backgroundColor = "red"}		
+		var newText  = document.createTextNode(content);
 		newCell.appendChild(newText);
 		return newCell;
 	}

@@ -203,7 +203,7 @@ function repeatPullMarketData_1(data) {
 
       if(ma_20[ma_20.length - 1] < ma_5[ma_5.length - 1] && prev_ma20above){
         //buy
-        createBuyRequest("0005", currAsk, 1, true, function(data){
+        createBuyRequest("0005", currAsk, 1000, true, function(data){
           // d = JSON.parse(data);
           // if (d.fills[0]) {
           //   profit-=d.fills[0].price;
@@ -218,7 +218,7 @@ function repeatPullMarketData_1(data) {
       }
       if(ma_20[ma_20.length - 1] > ma_5[ma_5.length - 1] && !prev_ma20above){
         // sell
-        createSellRequest("0005", currBid, 1, true, function(data){
+        createSellRequest("0005", currBid, 1000, true, function(data){
           // d = JSON.parse(data);
           // if (d.fills[0]) {
           //   profit+=d.fills[0].price;
