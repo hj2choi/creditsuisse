@@ -170,7 +170,8 @@ pullTeamData(function(data){
 function symbolDataHandler(buyList, sellList, _symbol) {
   //console.log("symbol data handler for "+_symbol);
   // don't allow another transaction for 10 secs
-  if (((new Date()) - lastTransactionTime[_symbol]) < MIN_TRADE_INTERVAL) {
+  var currTime = (new Date());
+  if ((currTime - lastTransactionTime[_symbol]) < MIN_TRADE_INTERVAL) {
     //console.log("transaction already made");
     return;
   }
@@ -189,15 +190,15 @@ function symbolDataHandler(buyList, sellList, _symbol) {
     console.log("tradableVolumeUnderEstimate = "+tradableVolumeUnderEstimate);
     // BUY AND SELL
     // TODO: sell extra volumes when running high on stocks
-    createBuyRequest(minSell.venue, _symbol, minSell.price, Math.max(tradableVolumeUnderEstimate/10,3), true, function(data) {
+    createBuyRequest(minSell.venue, _symbol, minSell.price, Math.max(tradableVolumeUnderEstimate/6,5), true, function(data) {
       d = JSON.parse(data);
       console.log(d.side + " "+d.status+" $"+d.price+" x"+d.qty);
     });
-    createSellRequest(maxBuy.venue, _symbol, maxBuy.price, Math.max(tradableVolumeUnderEstimate/10,3), true, function(data) {
+    createSellRequest(maxBuy.venue, _symbol, maxBuy.price, Math.max(tradableVolumeUnderEstimate/5,5), true, function(data) {
       d = JSON.parse(data);
       console.log(d.side + " "+d.status+" $"+d.price+" x"+d.qty);
     })
-    lastTransactionTime[_symbol] = (new Date());
+    lastTransactionTime[_symbol] = currTime;
 
   }
 
