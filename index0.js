@@ -1,5 +1,6 @@
 var TEAM_UID = "yPlWaf6NAoM6yjTTEs4_5g";
-var SYMBOLS = ["0005","0001","0388","0386","3988"];
+//var SYMBOLS = ["0005","0001","0388","0386","3988"];
+var SYMBOLS = ["0386","3988"];
 
 var LONG_MA_CNT = 30;
 var SHORT_MA_CNT = 7;

@@ -100,22 +100,18 @@ Price: <input type="text" id="price"><br>
 		 var price = document.getElementById("price").value;	
 	
 	   var data = "{\"team_uid\":\"yPlWaf6NAoM6yjTTEs4_5g\","
-	   +"\"side\":"+action+","
-	   +"\"symbol\":"+ stock+","
-	   +"\"ask\":"+price+","
-	   +"\"qty\":"+ amount+","
-	   +"\"order_type\":\"market\""
+	   +"\"side\":\""+action+"\","
+	   +"\"symbol\":\""+ stock+"\","
+	   +"\"ask\":\""+price+"\","
+	   +"\"ask\":\""+price+"\","
+	   +"\"price\":\""+price+"\","
+	   +"\"qty\":\""+ amount+"\","
+	   +"\"order_type\":\"limited\""
 	   +"};";
-	    
-		$.get('/api/buy', function(res){
-			    
-				
-				//var obj = $.parseJSON(res);
-					
-					
-					//insertRow(obj);
-						
-			});
+	    $.post('/api/orders',data,unction(res){
+		
+		
+		});
 	}
 	
 	
