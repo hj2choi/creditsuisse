@@ -1,11 +1,11 @@
 var TEAM_UID = "qyYHOXILX99RQ657y-OvAQ";
-//var SYMBOLS = ["0005","0001","0388","0386","3988"];
-var SYMBOLS = ["0005","0001","0388"];
+var SYMBOLS = ["0001", "3988","0386", "0005","0388"];
+//var SYMBOLS = ["0005","0001"];
 var EXCHANGE_CENTERS_CNT = 3;
 
-var POTENTIAL_PROFIT_THRESHOLD = 1.005;  // potential profit
+var POTENTIAL_PROFIT_THRESHOLD = 1.02;  // potential profit
 var VOLUME_THRESHOLD = 20;
-var MIN_TRADE_INTERVAL = 2000;
+var MIN_TRADE_INTERVAL = 500;
 
 var express = require('express')
 var request = require('request')
@@ -186,19 +186,23 @@ function symbolDataHandler(buyList, sellList, _symbol) {
   var potentialMaxProfit = maxBuy.price/minSell.price;
   var tradableVolumeUnderEstimate = Math.min(minSell.volume, maxBuy.volume);
 
+
   // if it is tradable, profitable, risk-free, then SELL AND BUY AT THE SAME TIME.
   if (potentialMaxProfit>POTENTIAL_PROFIT_THRESHOLD /*&& riskIndex>RISK_TOLERENCE_THRESHOLD*/ && tradableVolumeUnderEstimate>VOLUME_THRESHOLD) {
+    console.log("potentialMaxProfit = "+potentialMaxProfit);
     console.log("tradableVolumeUnderEstimate = "+tradableVolumeUnderEstimate);
     // BUY AND SELL
     // TODO: sell extra volumes when running high on stocks
-    createBuyRequest(minSell.venue, _symbol, minSell.price, Math.max(tradableVolumeUnderEstimate/6,5), true, function(data) {
+    createSellRequest(maxBuy.venue, _symbol, maxBuy.price, Math.max(tradableVolumeUnderEstimate/100,4), true, function(data) {
+      d = JSON.parse(data);
+      console.log(d.side + " "+d.status+" $"+d.price+" x"+d.qty);
+
+    });
+    createBuyRequest(minSell.venue, _symbol, minSell.price, Math.max(tradableVolumeUnderEstimate/100,4), true, function(data) {
       d = JSON.parse(data);
       console.log(d.side + " "+d.status+" $"+d.price+" x"+d.qty);
     });
-    createSellRequest(maxBuy.venue, _symbol, maxBuy.price, Math.max(tradableVolumeUnderEstimate/5,5), true, function(data) {
-      d = JSON.parse(data);
-      console.log(d.side + " "+d.status+" $"+d.price+" x"+d.qty);
-    })
+
     lastTransactionTime[_symbol] = currTime;
 
   }
@@ -239,4 +243,329 @@ function initPullSymbolData() {
   }
 }
 
+console.log("init(GOOD LUCK);");
 initPullSymbolData();
+
+
+
+
+
+
+
+
+/*
+
+console outputs:
+
+createBuyRequest(): limit_0005 $33.57 x4
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createSellRequest(): limit_0005 $34.65 x32.99
+ERR createSellRequest(): null
+potentialMaxProfit = 1.0274054215072983
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.49 x32.99
+ERR createSellRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+potentialMaxProfit = 1.0275047165127595
+tradableVolumeUnderEstimate = 300
+createSellRequest(): limit_0005 $34.49333333333334 x4
+ERR createSellRequest(): Error: connect ENOBUFS 50.17.200.93:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x4
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+potentialMaxProfit = 1.0274054215072983
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.49 x32.99
+ERR createSellRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+potentialMaxProfit = 1.0275047165127595
+tradableVolumeUnderEstimate = 300
+createSellRequest(): limit_0005 $34.49333333333334 x4
+ERR createSellRequest(): Error: connect ENOBUFS 50.17.200.93:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+createSellRequest(): limit_0005 $34.65 x32.99
+ERR createSellRequest(): null
+potentialMaxProfit = 1.0360440869824248
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: connect ENOBUFS 50.17.200.93:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): null
+potentialMaxProfit = 1.0360440869824248
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: connect ENOBUFS 50.17.200.93:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createSellRequest(): limit_0005 $34.65 x32.99
+ERR createSellRequest(): null
+potentialMaxProfit = 1.0275047165127595
+tradableVolumeUnderEstimate = 300
+createSellRequest(): limit_0005 $34.49333333333334 x4
+ERR createSellRequest(): Error: connect ENOBUFS 50.17.200.93:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x4
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+potentialMaxProfit = 1.0360440869824248
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: connect ENOBUFS 50.17.200.93:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+createSellRequest(): limit_0005 $34.65 x32.99
+ERR createSellRequest(): null
+potentialMaxProfit = 1.0268692284778076
+tradableVolumeUnderEstimate = 1053
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): Error: connect ENOBUFS 54.235.103.131:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x10.53
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): null
+createBuyRequest(): limit_0005 $33.57 x10.53
+buy NEW $33.57 x10
+potentialMaxProfit = 1.0274054215072983
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.49 x32.99
+ERR createSellRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createSellRequest(): limit_0005 $34.65 x32.99
+ERR createSellRequest(): null
+potentialMaxProfit = 1.0275047165127595
+tradableVolumeUnderEstimate = 300
+createSellRequest(): limit_0005 $34.49333333333334 x4
+ERR createSellRequest(): Error: connect ENOBUFS 50.17.200.93:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x4
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+potentialMaxProfit = 1.0268692284778076
+tradableVolumeUnderEstimate = 1053
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): Error: connect ENOBUFS 54.235.103.131:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x10.53
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createSellRequest(): limit_0005 $34.66 x32.99
+ERR createSellRequest(): null
+potentialMaxProfit = 1.0274054215072983
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.49 x32.99
+ERR createSellRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+createBuyRequest(): limit_0005 $33.57 x10.53
+buy NEW $33.57 x10
+potentialMaxProfit = 1.0274054215072983
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.49 x32.99
+ERR createSellRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+potentialMaxProfit = 1.0274054215072983
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.49 x32.99
+ERR createSellRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createSellRequest(): limit_0005 $34.65 x32.99
+ERR createSellRequest(): null
+potentialMaxProfit = 1.026005361930295
+tradableVolumeUnderEstimate = 41
+createSellRequest(): limit_0005 $34.443 x4
+ERR createSellRequest(): Error: connect ENOBUFS 54.235.103.131:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x4
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+potentialMaxProfit = 1.0268692284778076
+tradableVolumeUnderEstimate = 1053
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): Error: connect ENOBUFS 54.235.103.131:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x10.53
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+potentialMaxProfit = 1.0268692284778076
+tradableVolumeUnderEstimate = 1053
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): Error: connect ENOBUFS 54.235.103.131:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x10.53
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+potentialMaxProfit = 1.0268692284778076
+tradableVolumeUnderEstimate = 1053
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): Error: connect ENOBUFS 54.235.103.131:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x10.53
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createSellRequest(): limit_0005 $34.66 x32.99
+ERR createSellRequest(): null
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+potentialMaxProfit = 1.0268692284778076
+tradableVolumeUnderEstimate = 1053
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): Error: connect ENOBUFS 23.21.93.145:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x10.53
+ERR createBuyRequest(): Error: connect ENOBUFS 184.73.175.181:80 - Local (undefined:undefined)
+createBuyRequest(): limit_0005 $33.57 x6.25
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.72 x6.25
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+potentialMaxProfit = 1.0360440869824248
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.77 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+potentialMaxProfit = 1.0360440869824248
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.65 x32.99
+ERR createSellRequest(): null
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+createSellRequest(): limit_0005 $34.66 x4
+ERR createSellRequest(): null
+potentialMaxProfit = 1.0360440869824248
+tradableVolumeUnderEstimate = 3299
+createSellRequest(): limit_0005 $34.66 x4
+ERR createSellRequest(): null
+createSellRequest(): limit_0005 $34.65 x32.99
+ERR createSellRequest(): null
+potentialMaxProfit = 1.026005361930295
+tradableVolumeUnderEstimate = 41
+createBuyRequest(): limit_0005 $33.57 x32.99
+buy NEW $33.57 x32
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x10.53
+ERR createBuyRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x4
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.443 x4
+ERR createSellRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.443 x4
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x4
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.443 x4
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x4
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x10.53
+ERR createBuyRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x4
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.443 x4
+ERR createSellRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.63 x32.99
+ERR createSellRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.63 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x10.53
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.472 x10.53
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.77 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.77 x32.99
+ERR createSellRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.78 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createSellRequest(): limit_0005 $34.77 x32.99
+ERR createSellRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x32.99
+ERR createBuyRequest(): Error: socket hang up
+createBuyRequest(): limit_0005 $33.57 x11.72
+ERR createBuyRequest(): Error: socket hang up
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
