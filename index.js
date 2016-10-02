@@ -242,13 +242,6 @@ function repeatPullMarketData_1(data) {
       }
       if(ma_20[ma_20.length - 1] > ma_5[ma_5.length - 1] && !prev_ma20above){
         // sell
-       // createSellRequest("0005", currBid, 1000, true, function(data){
-          // d = JSON.parse(data);
-          // if (d.fills[0]) {
-          //   profit+=d.fills[0].price;
-          // }
-          // console.log("profit so far = " + profit);
-      //  });
       }
 
     }
@@ -320,6 +313,30 @@ app.get('/api/market_data_2', function(req, res) {
 });
 app.get('/api/market_data_3', function(req, res) {
   res.send(market_data_3);
+});
+
+app.post('/api/orders', function(req, res) {
+  var requestData = {
+  	"team_uid":TEAM_UID,
+  	"side":req.body.side,
+  	"symbol": req.body.symbol,
+  	"ask": req.body.price,
+    "bid": req.body.price,
+    "price": req.body.price,
+  	"qty": req.body.qty,
+  	"order_type": req.body.order_type
+  };
+  request.post({url:'http://cis2016-exchange1.herokuapp.com/api/orders', formData:requestData}, function (error, response, body) {
+    console.log("createBuyRequest(): "+req.body.order_type+"_"+req.body.symbol+" $"+req.body.ask+" x"+req.body.qty);
+    if (!error && response.statusCode == 200) {
+      //console.log(body) // Show the HTML for the Google homepage.
+      pullTeamData(function(){});
+      res.send(body);
+    } else {
+      console.log("ERR createBuyRequest(): "+error);
+      res.send(error);
+    }
+  })
 });
 
 app.get('/api/team_data', function(req, res) {
