@@ -288,6 +288,7 @@ app.get('/api/market_data_2', function(req, res) {
 });
 app.get('/api/market_data_3', function(req, res) {
   res.send(market_data_3);
+  
 });
 
 app.get('/api/team_data', function(req, res) {
