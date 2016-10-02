@@ -135,7 +135,7 @@ function createSellRequest(symbol, bid, qty, limit, callback) {
 function repeatPullMarketData_1(data) {
   market_data_1_raw = data;
   market_data_1=JSON.parse(data);
- 
+
   //console.log(market_data_1[0]);
   for (var i=0; i<market_data_1.length; ++i) {
     //console.log(market_data_1[i].symbol);
@@ -296,7 +296,7 @@ app.get('/api/team_data', function(req, res) {
 });
 app.get('/api/buy', function(req, res) {
   console.log(req);
-  
+
   //createBuyRequest("0001", 113, 3, false,function(data){res.send(data)});
 });
 // remove costly stocks first!
