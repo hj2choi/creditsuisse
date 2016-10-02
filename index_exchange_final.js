@@ -1,6 +1,5 @@
 var TEAM_UID = "qyYHOXILX99RQ657y-OvAQ";
 var SYMBOLS = ["0001", "3988","0386", "0005","0388"];
-//var SYMBOLS = ["0005","0001"];
 var EXCHANGE_CENTERS_CNT = 3;
 
 var POTENTIAL_PROFIT_THRESHOLD = 1.02;  // potential profit
