@@ -7,3 +7,5 @@ cocurrently pulls market data from three separate markets. Then, takes advantage
 Buy and Sell interval is within milliseconds. So the program can react quickly to narrow opportunities.</br>
 
 ensures slow but certain profit over long period of time.
+
+Apparently this doesn't really work in real-life markets aww D:
