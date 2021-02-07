@@ -1,6 +1,6 @@
 # Trading bot
 
-index_exchange_final.js</br></br>
+<b><u>index_exchange_final.js</u></b></br></br>
 
 Used Margin Trading strategy.</br>
 cocurrently pulls market data from three separate markets. Then, takes advantage of small price difference across markets.</br>
